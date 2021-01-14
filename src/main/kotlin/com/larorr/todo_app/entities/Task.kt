@@ -3,8 +3,11 @@ package com.larorr.todo_app.entities
 //  + https://stackoverflow.com/questions/30589257/json-jpa-manytoone-and-onetomany-recursive
 // TODO LAZY fetching! (not by default!! https://stackoverflow.com/questions/26601032/default-fetch-type-for-one-to-one-many-to-one-and-one-to-many-in-hibernate)
 // TODO USE @CreatedDate
-
+// TODO or try onetomany
+// TODO как работает генератор id - для всех?
+import com.fasterxml.jackson.annotation.JsonIdentityReference
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import org.hibernate.annotations.CreationTimestamp
 import org.springframework.data.annotation.CreatedDate
 import java.util.*
@@ -24,6 +27,8 @@ class Task(
         // TODO add order?
         var isCompleted: Boolean = false,
         // if null -> use main for user?
+//        @JsonIdentityReference(alwaysAsId = true)
+//        @JsonManagedReference
         @ManyToOne var todoList: TodoList,
 //        TODO change to tag or group (just name or Group entity)?
         // TODO проблема не может существовать пустых групп
@@ -33,10 +38,8 @@ class Task(
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
+    // TODO move it to front?
     var creationDate: Date = Date()
-//    init {
-//        creationDate = Date()
-//    }
 }
 
 //@JsonIgnoreProperties(ignoreUnknown = true,
@@ -59,6 +62,7 @@ class User(
 @Entity
 class TodoList(
         var name: String,
+//        @JsonIdentityReference(alwaysAsId = true)
         @ManyToOne var user: User,
         @Id @GeneratedValue var listId: Long? = null
 )

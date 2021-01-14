@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.*
 class TasksController(private val taskRepository: TaskRepository,
                       private val todoListRepository: TodoListRepository) {
 //    TODO repos
-
-
     // C: TODO POST new task, ? post new list, post new user
     // R:   TODO Get all (for user), get all for list, get by id,
     // U: PUT new info to task + list? + user?
@@ -26,15 +24,31 @@ class TasksController(private val taskRepository: TaskRepository,
         return taskRepository.findById(taskId).orElse(null)
     }
 
-    @GetMapping("/list/{listId}")
-    fun getAllByListId(@PathVariable listId: Long) : List<Task> {
-        return taskRepository.findAllByTodoList_ListId(listId).toList()
+    @GetMapping
+    fun getTasks(@RequestParam(required = false) userId: Long?) : Iterable<Task> {
+        //TODO other way / move to user / delete for all
+        return when (userId) {
+            null -> {
+                taskRepository.findAll()
+            }
+            else -> {
+                taskRepository.findAllByTodoList_User_UserId(userId)
+            }
+        }
     }
 
-    @GetMapping("/user/{userId}")
-    fun getAllByUserId(@PathVariable userId: Long) : List<Task> {
-        return taskRepository.findAllByTodoList_User_UserId(userId).toList()
-    }
+//    // TODO Move to list + OneToMany?
+//    @GetMapping("/list/{listId}")
+//    fun getAllByListId(@PathVariable listId: Long) : List<Task> {
+//        return taskRepository.findAllByTodoList_ListId(listId).toList()
+//    }
+//
+//    @GetMapping("/user/{userId}")
+//    fun getAllByUserId(@PathVariable userId: Long) : List<Task> {
+//        return taskRepository.findAllByTodoList_User_UserId(userId).toList()
+//    }
+
+
 //    fun findAll() = taskRepository.findAll()
 
 //    User("log","pass")
@@ -48,17 +62,18 @@ class TasksController(private val taskRepository: TaskRepository,
 
 }
 
+// TODO change to auth
 @RestController
 @RequestMapping("/users")
 class UserController(private val userRepository: UserRepository) {
 
-    @GetMapping("/")
+    @GetMapping
     fun findAll() = userRepository.findAll()
 
     /**
      * If there is no such user return null
      */
-    @GetMapping("/id")
+    @PostMapping("/login")
     fun findIdByLoginAndPassword(@RequestBody loginInfo: LoginInfo): User? {
         return userRepository.findByLoginAndPassword(loginInfo.login, loginInfo.password)
     }
@@ -69,12 +84,44 @@ class UserController(private val userRepository: UserRepository) {
 
 @RestController
 @RequestMapping("/lists")
-class TodoListController(private val repository: TodoListRepository) {
+class TodoListController(private val todoListRepository: TodoListRepository,
+                         private val taskRepository: TaskRepository) {
+//// TODO moveto user?
+//    @GetMapping("/user/{userId}")
+//    fun getTasksByList(@PathVariable userId: Long) : List<TodoList> {
+//        return todoListRepository.findAllByUser_UserId(userId).toList()
+//    }
 
-    @GetMapping("/user/{userId}")
-    fun getTasksByList(@PathVariable userId: Long) : List<TodoList> {
-        return repository.findAllByUser_UserId(userId).toList()
+//    @GetMapping
+//    fun getAllLists(): Iterable<TodoList> = todoListRepository.findAll()
+
+    @GetMapping("/{listId}")
+    fun getListById(@PathVariable listId: Long) : TodoList? {
+        // TODO try without toList()
+        return todoListRepository.findById(listId).orElse(null)
     }
 
+    @GetMapping
+    fun getListByUserId(@RequestParam(required = false) userId: Long?) : Iterable<TodoList> {
+        return when (userId) {
+            null -> {
+                todoListRepository.findAll()
+            }
+            else -> {
+                todoListRepository.findAllByUser_UserId(userId)
+            }
+        }
+    }
+
+
+    @GetMapping("/{listId}/tasks")
+    fun getTasksOfList(@PathVariable listId: Long) : Iterable<Task> {
+        return taskRepository.findAllByTodoList_ListId(listId)
+    }
+
+//    @PostMapping("/{listId}/tasks")
+//    fun createTask(@PathVariable listId: Long, @RequestBody task: Task) : Iterable<Task> {
+////        return taskRepository.save(tas)
+//    }
 
 }

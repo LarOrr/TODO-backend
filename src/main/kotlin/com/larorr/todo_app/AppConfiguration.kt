@@ -59,5 +59,16 @@ class BlogConfiguration {
 ////                creationDate = java.util.Calendar.getInstance().time,
 //                todoList = todoList2
 //        ))
+
+
+        val user2 = userRepository.save(User("user2", "my_pass2"))
+        val todoList21 = todoListRepository.save(TodoList("Main", user2))
+//        println(user1.userId)
+//
+        taskRepository.save(Task(
+                name = "Buy cool apples",
+//                creationDate = java.util.Calendar.getInstance().time,
+                todoList = todoList21
+        ))
     }
 }
