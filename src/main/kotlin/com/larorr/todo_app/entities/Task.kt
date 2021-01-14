@@ -5,11 +5,11 @@ package com.larorr.todo_app.entities
 // TODO USE @CreatedDate
 // TODO or try onetomany
 // TODO как работает генератор id - для всех?
-import com.fasterxml.jackson.annotation.JsonIdentityReference
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonManagedReference
+// TODO cascade
+import com.fasterxml.jackson.annotation.*
 import org.hibernate.annotations.CreationTimestamp
 import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.rest.core.annotation.RestResource
 import java.util.*
 import javax.persistence.*
 
@@ -29,7 +29,11 @@ class Task(
         // if null -> use main for user?
 //        @JsonIdentityReference(alwaysAsId = true)
 //        @JsonManagedReference
-        @ManyToOne var todoList: TodoList,
+//        @ManyToOne(fetch=FetchType.LAZY)
+        @ManyToOne
+        @JoinColumn(name="list_id")
+        @RestResource
+        var todoList: TodoList,
 //        TODO change to tag or group (just name or Group entity)?
         // TODO проблема не может существовать пустых групп
 //        var listName: String = "Main",
@@ -42,6 +46,40 @@ class Task(
     var creationDate: Date = Date()
 }
 
+@Entity
+class TodoList(
+        var name: String,
+//        @JsonIdentityReference(alwaysAsId = true)
+//        @ManyToOne(fetch=FetchType.LAZY)
+        @ManyToOne
+        @JoinColumn(name="user_id", nullable = false)
+        @JsonIgnore
+        @RestResource(path="user")
+        var user: User?,
+        @Id @GeneratedValue var listId: Long? = null
+) {
+    // TODO вернуть как было, почемуб его не возвращать, А СЕТТЕР ИГНОРИТЬ И ИСПОЛЬЗОВАТЬ
+    // СВОЙ СЕТТЕР для этого
+    @JsonProperty("userId")
+    fun getUserId() = user?.userId
+    @Transient
+    var userId: Long = -1
+        get() = user?.userId ?: field
+        @JsonSetter("userId")
+        set(value) {
+            field = value
+        }
+
+//    fun setUserId {
+//
+//    }
+
+//    @JsonProperty("userId")
+//    fun setUserId() {
+//        user = User(null, )
+//    }
+}
+
 //@JsonIgnoreProperties(ignoreUnknown = true,
 //        value = ["password"])
 // TODO don't return password
@@ -49,6 +87,7 @@ class Task(
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 //@JsonIgnoreProperties(ignoreUnknown = true)
 class User(
+        @Column(unique = true)
         var login: String,
 //        @get:JsonIgnore // @JsonProperty(value = "user_password")
 //        @JsonProperty(access = Access.WRITE_ONLY)
@@ -57,12 +96,9 @@ class User(
         var password: String,
         // using generated id https://youtrack.jetbrains.com/issue/KT-6653
         @Id @GeneratedValue var userId: Long? = null
-)
 
-@Entity
-class TodoList(
-        var name: String,
-//        @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne var user: User,
-        @Id @GeneratedValue var listId: Long? = null
-)
+) {
+//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+//    var todoLists: List<TodoList> = mutableListOf()
+}
+
