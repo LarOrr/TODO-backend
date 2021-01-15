@@ -16,8 +16,3 @@ fun main(args: Array<String>) {
         setBannerMode(Banner.Mode.OFF)
     }
 }
-
-//@GetMapping("/hello")
-//fun sayHello(@RequestParam(value = "myName", defaultValue = "World") name: String?): String? {
-//    return String.format("Hello %s!", name)
-//}
