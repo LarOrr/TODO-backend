@@ -12,6 +12,7 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.rest.core.annotation.RestResource
 import java.util.*
 import javax.persistence.*
+import kotlin.properties.Delegates
 
 // check https://www.google.com/search?q=todo+database+schema&newwindow=1&sxsrf=ALeKk023jP_j4OELe2BvVIhTS56ZbTbhDQ:1610482156799&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjMtP3GmZfuAhVpmYsKHQKzCl8Q_AUoAXoECBEQAw&biw=1280&bih=578#imgrc=ELA5RM373CY5KM
 // https://stackoverflow.com/questions/28835171/database-schema-for-task-management
@@ -33,6 +34,7 @@ class Task(
         @ManyToOne
         @JoinColumn(name="list_id")
         @RestResource
+        @get:JsonIgnore
         var todoList: TodoList,
 //        TODO change to tag or group (just name or Group entity)?
         // TODO проблема не может существовать пустых групп
@@ -44,6 +46,24 @@ class Task(
     @Temporal(TemporalType.TIMESTAMP)
     // TODO move it to front?
     var creationDate: Date = Date()
+
+    @JsonProperty("listId")
+    fun getListId() = todoList.listId
+
+    /**
+     * We need it for json
+     */
+    var jsonListId: Long = -1L
+            @Transient
+            @JsonIgnore
+            get
+            @JsonSetter("listId")
+            set
+
+    @JsonGetter("taskId")
+    fun getId(): Long? {
+        return taskId
+    }
 }
 
 @Entity
@@ -78,6 +98,15 @@ class TodoList(
 //    fun setUserId() {
 //        user = User(null, )
 //    }
+    @JsonBackReference
+    @OneToMany(mappedBy = "todoList", fetch = FetchType.LAZY)
+    @RestResource(path="tasks", rel="tasks")
+    var tasks: MutableList<Task> = mutableListOf()
+
+    @JsonGetter("listId")
+    fun getId(): Long? {
+        return listId
+    }
 }
 
 //@JsonIgnoreProperties(ignoreUnknown = true,
@@ -95,10 +124,17 @@ class User(
         @JsonIgnore
         var password: String,
         // using generated id https://youtrack.jetbrains.com/issue/KT-6653
-        @Id @GeneratedValue var userId: Long? = null
+        @Id @GeneratedValue var userId: Long? = null,
 
 ) {
-//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-//    var todoLists: List<TodoList> = mutableListOf()
+    @JsonBackReference
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @RestResource(path="lists", rel="lists")
+    var todoLists: MutableList<TodoList> = mutableListOf()
+
+    @JsonGetter("userId")
+    fun getId(): Long? {
+        return userId
+    }
 }
 
