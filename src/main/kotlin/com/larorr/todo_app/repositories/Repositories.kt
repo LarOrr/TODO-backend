@@ -19,5 +19,5 @@ interface TodoListRepository : CrudRepository<TodoList, Long> {
 
 @RepositoryRestResource(collectionResourceRel = "users", path = "users")
 interface UserRepository : CrudRepository<User, Long> {
-    fun findByLoginAndPassword(login: String, password: String): User
+    fun findByLoginAndPassword(login: String, password: String): User?
 }
