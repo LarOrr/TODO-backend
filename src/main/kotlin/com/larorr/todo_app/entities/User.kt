@@ -18,6 +18,8 @@ data class User(
         var login: String,
         @JsonIgnore
         var password: String,
+        // User id instead of using just "login" because of note about
+        // KT-6653 in https://spring.io/guides/tutorials/spring-boot-kotlin
         @Id @GeneratedValue var userId: Long? = null,
 ) {
     @JsonBackReference

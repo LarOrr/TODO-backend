@@ -50,8 +50,10 @@ class UserController(private val userRepository: UserRepository,
         // Create Main list for every user
         val mainList = TodoList("Main", user)
         user.todoLists.add(mainList)
+        // First save user because task without user can't exist
+        val saveResult = userRepository.save(user)
         todoListRepository.save(mainList)
-        return userRepository.save(user)
+        return saveResult
     }
 
     // TODO solve problem with password

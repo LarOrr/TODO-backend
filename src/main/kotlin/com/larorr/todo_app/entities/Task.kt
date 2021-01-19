@@ -11,12 +11,12 @@ data class Task(
         var name: String,
         var description: String? = null,
         // It's better to get date from frontend
-        @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+        @JsonFormat(pattern = DATE_FORMAT)
         var deadline: Date? = null,
         var isCompleted: Boolean = false,
         @CreationTimestamp
         @Temporal(TemporalType.TIMESTAMP)
-        @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+        @JsonFormat(pattern = DATE_FORMAT)
         var creationDate: Date = Date(),
         @ManyToOne
         @JoinColumn(name = "list_id")
@@ -26,6 +26,10 @@ data class Task(
 //        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class)
         var todoList: TodoList?,
         @Id @GeneratedValue var taskId: Long? = null) {
+
+    companion object {
+        const val DATE_FORMAT: String = "yyyy-MM-dd HH:mm:ss"
+    }
 
     /**
      * Property for resolving json problem
