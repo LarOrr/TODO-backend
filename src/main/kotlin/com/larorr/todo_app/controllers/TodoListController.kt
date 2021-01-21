@@ -16,6 +16,11 @@ class TodoListController(private val todoListRepository: TodoListRepository,
                          private val taskRepository: TaskRepository,
                          private val userRepository: UserRepository) {
 
+    companion object {
+        // TODO Put this constant somewhere to share with TaskController?
+        const val MAIN_LIST_NAME: String = "Main"
+    }
+
     @GetMapping("/{listId}")
     fun getListById(@PathVariable listId: Long): TodoList? {
         return todoListRepository.findById(listId).orElse(null)
@@ -59,6 +64,11 @@ class TodoListController(private val todoListRepository: TodoListRepository,
             throw ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "\"userId\" for list object must be present in the request")
         }
+        if (newList.name == MAIN_LIST_NAME)
+            // Because here can be only one Main
+            throw ResponseStatusException(HttpStatus.CONFLICT,
+                    "It's impossible to create list with name \"Main\"")
+
         newList.user = userRepository.findById(newList.userId).orElseThrow {
             ResponseStatusException(HttpStatus.NOT_FOUND,
                     "User with such id ${newList.userId} doesn't exist")
@@ -82,7 +92,14 @@ class TodoListController(private val todoListRepository: TodoListRepository,
     }
 
     @DeleteMapping("/{listId}")
-    fun updateTask(@PathVariable listId: Long) {
+    fun deleteTask(@PathVariable listId: Long) {
+        val list = todoListRepository.findById(listId).orElseThrow {
+            ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "ListId with such id $listId doesn't exist")
+        }
+        if (list.name == MAIN_LIST_NAME)
+            throw ResponseStatusException(HttpStatus.CONFLICT,
+                    "It is impossible to delete Main list")
         todoListRepository.deleteById(listId)
     }
 }

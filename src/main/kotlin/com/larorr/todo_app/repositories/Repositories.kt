@@ -8,7 +8,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource
 
 @RepositoryRestResource(collectionResourceRel = "tasks", path = "tasks")
 interface TaskRepository : CrudRepository<Task, Long> {
-    fun findAllByTodoList_ListId(listId: Long): Iterable<Task>
     fun findAllByTodoList_User_UserId(userId: Long): Iterable<Task>
 }
 
@@ -19,5 +18,8 @@ interface TodoListRepository : CrudRepository<TodoList, Long> {
 
 @RepositoryRestResource(collectionResourceRel = "users", path = "users")
 interface UserRepository : CrudRepository<User, Long> {
+    // TODO check what is better to return - nullable or optional
     fun findByLoginAndPassword(login: String, password: String): User?
+    fun findByLogin(login: String): User?
+    fun existsByLogin(login: String): Boolean
 }

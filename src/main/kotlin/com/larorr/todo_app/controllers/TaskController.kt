@@ -24,16 +24,11 @@ class TaskController(private val taskRepository: TaskRepository,
     }
 
     @GetMapping
-    fun getTasks(@RequestParam(required = false) userId: Long?): Iterable<Task> {
-        return when (userId) {
-            null -> {
-                taskRepository.findAll()
-            }
-            else -> {
-                taskRepository.findAllByTodoList_User_UserId(userId)
-            }
+    fun getTasks(@RequestParam(required = false) userId: Long?): Iterable<Task> =
+        when (userId) {
+            null -> taskRepository.findAll()
+            else -> taskRepository.findAllByTodoList_User_UserId(userId)
         }
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
