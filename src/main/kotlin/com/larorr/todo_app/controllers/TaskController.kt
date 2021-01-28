@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
-//@RepositoryRestController
+@CrossOrigin
 @RequestMapping("/tasks")
+//@RepositoryRestController
 class TaskController(private val taskRepository: TaskRepository,
                      private val todoListRepository: TodoListRepository) {
 

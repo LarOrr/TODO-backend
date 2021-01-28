@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
-//@RepositoryRestController
+@CrossOrigin
 @RequestMapping("/users")
+//@RepositoryRestController
 class UserController(private val userRepository: UserRepository,
                      private val todoListRepository: TodoListRepository) {
 
