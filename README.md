@@ -47,3 +47,11 @@ Example call:
 ```
 
 Other possible calls can be checked in [HTTP Controllers files](src/main/kotlin/com/larorr/todo_app/controllers) 
+
+## Refactoring and TODOs
+What is possible to improve:
+1. Add Service layer (classes for repository access with @Service and interfaces for them)
+ to avoid accessing the repositories directly from the controllers.
+2. Add exception handlers for the controllers
+3. JWT authorisation
+4. Try to use Spring Data REST with custom controllers (HATEOAS + access resources from resources)
